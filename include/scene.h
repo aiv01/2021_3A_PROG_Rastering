@@ -1,9 +1,17 @@
 #ifndef SCENE_H
 #define SCENE_H
 #include <SDL.h>
+#include "vec.h"
+
+typedef struct{
+    vector3 v1;
+    vector3 v2;
+    vector3 v3;
+} triangle;
 
 typedef struct {
-    int todo;
+    triangle triangle;
+    SDL_Renderer* renderer;
 } scene;
 
 scene* scene_create(int w, int h, SDL_Renderer*);
