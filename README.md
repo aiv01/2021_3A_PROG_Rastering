@@ -1,4 +1,4 @@
-Raycasting implementation for Programming course - 3rd year.
+Rastering implementation for Programming course - 3rd year.
 
 # IDE
 # VSCode 
