@@ -2,6 +2,7 @@
 #define SCENE_H
 #include <SDL.h>
 #include "vec.h"
+#include "screen.h"
 
 typedef struct{
     vector3 v1;
@@ -11,7 +12,7 @@ typedef struct{
 
 typedef struct {
     triangle triangle;
-    SDL_Renderer* renderer;
+    screen* screen;
 } scene;
 
 scene* scene_create(int w, int h, SDL_Renderer*);
