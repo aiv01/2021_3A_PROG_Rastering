@@ -70,7 +70,7 @@ int main() {
         SDL_RenderPresent(renderer);
     }
 
-    scene_destroy(scene);
+    //scene_destroy(scene);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);  
     SDL_Quit();

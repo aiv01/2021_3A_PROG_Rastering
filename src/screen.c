@@ -7,10 +7,10 @@ screen* screen_new(int w, int h, SDL_Renderer* r) {
     s->height = h;
     s->color_format = 4;
     int buffer_size = sizeof(Uint8) * s->width * s->height * s->color_format;
-    printf("%d\n", buffer_size);
     s->color_buffer = malloc(buffer_size);
     
     s->renderer = r;
+    
     s->texture = SDL_CreateTexture(r,   
             SDL_PIXELFORMAT_RGBA32,
             SDL_TEXTUREACCESS_STATIC,
@@ -22,6 +22,10 @@ void screen_put_pixel(screen* s, int x, int y, color* c) {
     if ( x < 0 || x >= s->width) return;
     if ( y < 0 || y >= s->height) return;
 
+    //SDL_SetRenderDrawColor(s->renderer,c->r,c->g,c->b,c->a);
+    //SDL_RenderDrawPoint(s->renderer, x, y);
+    
+    
     int index = (y * s->width + x) * s->color_format;
     s->color_buffer[index + 0] = c->r;
     s->color_buffer[index + 1] = c->g;
