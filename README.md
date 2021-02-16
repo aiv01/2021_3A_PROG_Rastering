@@ -27,6 +27,9 @@ Configure under `.vscode/` the folliwing files:
 - `launch.json`
 ```
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
@@ -40,11 +43,13 @@ Configure under `.vscode/` the folliwing files:
             "cwd": "${workspaceFolder}",
             "environment": [
                 {
+                    // add the directory where our target was built to the PATHs
+                    // it gets resolved by CMake Tools:
                     "name": "PATH",
                     "value": "$PATH:${command:cmake.launchTargetDirectory}"
                 }
             ],
-            "externalConsole": false
+            "console": "integratedTerminal"
         }
     ]
 }
