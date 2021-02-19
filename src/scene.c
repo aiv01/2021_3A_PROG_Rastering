@@ -3,6 +3,8 @@
 #include "color.h"
 #include "line-raster.h"
 #include "bound-raster.h"
+#include <stdio.h>
+#include <string.h>
 
 scene* scene_create(int screen_width, int screen_height, SDL_Renderer* r) {
     scene* s = malloc(sizeof(scene));
@@ -34,3 +36,4 @@ void scene_destroy(scene* s) {
     screen_destroy(s->screen);
     free(s);
 }
+
