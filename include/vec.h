@@ -10,6 +10,8 @@ typedef struct{
 
 vector3 vector3_new(float x, float y, float z);
 
+vector3 vector3_sub(vector3* v1, vector3* v2);
+
 typedef struct{
     int x;
     int y;

@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include "vec.h"
 #include "screen.h"
+#include "camera.h"
 
 typedef struct{
     vector3 v1;
@@ -13,6 +14,7 @@ typedef struct{
 typedef struct {
     triangle triangle;
     screen* screen;
+    camera* camera;
 } scene;
 
 scene* scene_create(int w, int h, SDL_Renderer*);

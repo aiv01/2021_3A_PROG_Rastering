@@ -1,14 +1,14 @@
 #pragma once
 #include "common.h"
 
-static int min(int a, int b, int c) {
+static int cmn_min(int a, int b, int c) {
     float r = a;
     if (b < r) r = b;
     if (c < r) r = c;
     return r;
 }
 
-static int max(int a, int b, int c) {
+static int cmn_max(int a, int b, int c) {
     float r = a;
     if (b > r) r = b;
     if (c > r) r = c;
@@ -34,10 +34,10 @@ static boolean is_point_in_triangle(vector2* p, vector2* a, vector2* b, vector2*
 }
 
 static void bound_raster(screen* s, vector2* t0, vector2* t1, vector2* t2, color* c) {
-    int x_min = min(t0->x, t1->x, t2->x);
-    int x_max = max(t0->x, t1->x, t2->x);
-    int y_min = min(t0->y, t1->y, t2->y);
-    int y_max = max(t0->y, t1->y, t2->y);
+    int x_min = cmn_min(t0->x, t1->x, t2->x);
+    int x_max = cmn_max(t0->x, t1->x, t2->x);
+    int y_min = cmn_min(t0->y, t1->y, t2->y);
+    int y_max = cmn_max(t0->y, t1->y, t2->y);
 
     for(int x = x_min; x< x_max; x++) {
         for(int y = y_min; y < y_max; y++) {
