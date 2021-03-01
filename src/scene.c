@@ -5,6 +5,7 @@
 #include "bound-raster.h"
 #include <stdio.h>
 #include <string.h>
+#include "wobj.h"
 
 scene* scene_create(int screen_width, int screen_height, SDL_Renderer* r) {
     scene* s = malloc(sizeof(scene));
@@ -14,8 +15,16 @@ scene* scene_create(int screen_width, int screen_height, SDL_Renderer* r) {
     s->screen = screen_new(screen_width, screen_height, r);
 
     s->camera = camera_new(60.f, screen_width, screen_height);
-    s->camera->position = vector3_new(0, 0, 0);
+    s->camera->position = vector3_new(0, 0, 5);
     return s;
+}
+
+static vector3 vector3_mult(vector3* v, float scalar) {
+    vector3 r;
+    r.x = v->x * scalar;
+    r.y = v->y * scalar;
+    r.z = v->z * scalar;
+    return r;
 }
    
 void scene_update(scene* s, float delta_time) {
@@ -30,7 +39,9 @@ void scene_update(scene* s, float delta_time) {
     vector2 t2 = { 100, 200 };
     vector2 t3 = { 300, 200 };
     bound_raster(s->screen, &t1, &t2, &t3, &r);
-*/
+*/  
+
+
     vector2 sp1 = camera_world_to_screen_point(s->camera, &s->triangle.v1);
     vector2 sp2 = camera_world_to_screen_point(s->camera, &s->triangle.v2);
     vector2 sp3 = camera_world_to_screen_point(s->camera, &s->triangle.v3);

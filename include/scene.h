@@ -5,6 +5,8 @@
 #include "screen.h"
 #include "camera.h"
 
+#include "wobj.h"
+
 typedef struct{
     vector3 v1;
     vector3 v2;
