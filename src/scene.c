@@ -46,9 +46,8 @@ static void draw_quad(scene* s) {
         vector2 sp2 = camera_world_to_screen_point(s->camera, &wp2);
         vector2 sp3 = camera_world_to_screen_point(s->camera, &wp3);
 
-        //color r = {255, 0, 0, 255};
-        //bound_raster(s->screen, &sp1, &sp2, &sp3, &r);
-        scanline_raster(s->screen, &sp1, &sp2, &sp3);
+        color r = {255, 0, 0, 255};
+        bound_raster(s->screen, &sp1, &sp2, &sp3, &r);
     }  
 }
 
@@ -111,7 +110,22 @@ static void draw_suzanne(scene* s, float delta_time) {
         vector2 sp2 = camera_world_to_screen_point(s->camera, &wp2);
         vector2 sp3 = camera_world_to_screen_point(s->camera, &wp3);
 
-        scanline_raster(s->screen, &sp1, &sp2, &sp3);
+
+        color r = {255, 0, 0, 255};
+        color g = {0, 255, 0, 255};
+        color b = {0, 0, 255, 255};
+
+        vertex v1;
+        v1.screen_pos = &sp1;
+        v1.color = &r;
+        vertex v2;
+        v2.screen_pos = &sp2;
+        v2.color = &g;
+        vertex v3;
+        v3.screen_pos = &sp3;
+        v3.color = &b;
+
+        scanline_raster(s->screen, &v1, &v2, &v3);
     }  
 } 
    
