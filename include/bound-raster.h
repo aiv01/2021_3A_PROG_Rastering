@@ -43,7 +43,7 @@ static void bound_raster(screen* s, vector2* t0, vector2* t1, vector2* t2, color
         for(int y = y_min; y < y_max; y++) {
             vector2 pt = {x, y};
             if (is_point_in_triangle(&pt, t0, t1, t2)) {
-                screen_put_pixel(s, x, y, c);
+                screen_put_pixel(s, x, y, 0, c);
             }
         }
     }

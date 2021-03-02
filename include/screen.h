@@ -7,6 +7,7 @@ typedef struct {
     int height;
     Uint8* color_buffer;
     int color_format;
+    float* depth_buffer;
     SDL_Renderer* renderer;
     SDL_Texture* texture;
 } screen;
@@ -14,7 +15,7 @@ typedef struct {
 
 screen* screen_new(int w, int h, SDL_Renderer* r); 
 
-void screen_put_pixel(screen* s, int x, int y, color* c); //color;
+void screen_put_pixel(screen* s, int x, int y, float z, color* c); //color;
 
 void screen_blit(screen* s); 
 void screen_clear(screen* s);

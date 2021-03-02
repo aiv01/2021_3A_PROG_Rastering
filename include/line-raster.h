@@ -29,7 +29,7 @@ static void dda_line(screen* scr, vector2* v1, vector2* v2) {
         //SDL_SetRenderDrawColor(scr->renderer,255,0,0,255);
         //SDL_RenderDrawPoint(scr->renderer,(int)x,(int)y);
 
-        screen_put_pixel(scr, (int)x, (int)y, &red);
+        screen_put_pixel(scr, (int)x, (int)y, 0, &red);
         x += step_x;
         y += step_y;
     }

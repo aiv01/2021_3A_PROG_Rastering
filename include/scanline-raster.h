@@ -5,6 +5,7 @@
 typedef struct {
     vector2* screen_pos;
     color* color;
+    float z;
 } vertex;
 
 // y: v1 < v2 < v3
@@ -52,12 +53,18 @@ static void __interpolate_row(screen* s, int y,
     color left_color = __interpolate_color(left_edge_v1->color, left_edge_v2->color, left_gradient_y);
     color right_color = __interpolate_color(right_edge_v1->color, right_edge_v2->color, left_gradient_y);
 
-    
+    float left_z = __interpolate_scalar(left_edge_v1->z, left_edge_v2->z, left_gradient_y);
+    float right_z = __interpolate_scalar(right_edge_v1->z, right_edge_v2->z, right_gradient_y);
+
+
     for(int x=left_x; x <= right_x; x++) {
         float gradient_x = 1.f;
         if (left_x < right_x) gradient_x = (float)(x - left_x) / (float)(right_x - left_x);
         color c = __interpolate_color(&left_color, &right_color, gradient_x);
-        screen_put_pixel(s, x, y, &c);
+
+        float z = __interpolate_scalar(left_z, right_z, gradient_x);
+
+        screen_put_pixel(s, x, y, z, &c);
     }
 }
 

@@ -46,3 +46,7 @@ static vector2 camera_world_to_screen_point(camera* cam, vector3* world_point) {
     int screen_y = (int)( (1.f - (plane_y + 1.f)*0.5f ) * cam->height );
     return vector2_new(screen_x, screen_y);
 }
+
+static vector3 camera_world_to_camera_point(camera* cam, vector3* world_point){
+    return vector3_sub(world_point, &cam->position);
+}

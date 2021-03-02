@@ -110,6 +110,9 @@ static void draw_suzanne(scene* s, float delta_time) {
         vector2 sp2 = camera_world_to_screen_point(s->camera, &wp2);
         vector2 sp3 = camera_world_to_screen_point(s->camera, &wp3);
 
+        vector3 cp1 = camera_world_to_camera_point(s->camera, &wp1);
+        vector3 cp2 = camera_world_to_camera_point(s->camera, &wp2);
+        vector3 cp3 = camera_world_to_camera_point(s->camera, &wp3);
 
         color r = {255, 0, 0, 255};
         color g = {0, 255, 0, 255};
@@ -118,12 +121,15 @@ static void draw_suzanne(scene* s, float delta_time) {
         vertex v1;
         v1.screen_pos = &sp1;
         v1.color = &r;
+        v1.z = cp1.z;
         vertex v2;
         v2.screen_pos = &sp2;
         v2.color = &g;
+        v2.z = cp2.z;
         vertex v3;
         v3.screen_pos = &sp3;
         v3.color = &b;
+        v3.z = cp3.z;
 
         scanline_raster(s->screen, &v1, &v2, &v3);
     }  
