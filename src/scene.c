@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "wobj.h"
+#include "scanline-raster.h"
 
 scene* scene_create(int screen_width, int screen_height, SDL_Renderer* r) {
     scene* s = malloc(sizeof(scene));
@@ -45,12 +46,13 @@ static void draw_quad(scene* s) {
         vector2 sp2 = camera_world_to_screen_point(s->camera, &wp2);
         vector2 sp3 = camera_world_to_screen_point(s->camera, &wp3);
 
-        color r = {255, 0, 0, 255};
-        bound_raster(s->screen, &sp1, &sp2, &sp3, &r);
+        //color r = {255, 0, 0, 255};
+        //bound_raster(s->screen, &sp1, &sp2, &sp3, &r);
+        scanline_raster(s->screen, &sp1, &sp2, &sp3);
     }  
 }
 
-static void draw_suzanne(scene* s, float delta_time) {
+static void draw_suzanne_simple(scene* s, float delta_time) {
     wobj* obj = s->suzanne_obj;
 
     boolean fill = true;
@@ -84,6 +86,32 @@ static void draw_suzanne(scene* s, float delta_time) {
             dda_line(s->screen, &sp2, &sp3);
             dda_line(s->screen, &sp3, &sp1);
         }
+    }  
+} 
+
+static void draw_suzanne(scene* s, float delta_time) {
+    wobj* obj = s->suzanne_obj;
+
+    boolean fill = true;
+
+    for (size_t i = 0; i < obj->triangles_count; i++)
+    {
+        wobj_triangle* t = &obj->triangles[i];
+
+        vector3 wp1 = vector3_mult( (vector3*)&t->v1.position, 2.f);
+        vector3 wp2 = vector3_mult( (vector3*)&t->v2.position, 2.f);
+        vector3 wp3 = vector3_mult( (vector3*)&t->v3.position, 2.f);
+
+        s->suzanne_rotation += 0.01f * delta_time;
+        wp1 = vector3_rotate_on_y(&wp1, s->suzanne_rotation);
+        wp2 = vector3_rotate_on_y(&wp2, s->suzanne_rotation);
+        wp3 = vector3_rotate_on_y(&wp3, s->suzanne_rotation);
+
+        vector2 sp1 = camera_world_to_screen_point(s->camera, &wp1);
+        vector2 sp2 = camera_world_to_screen_point(s->camera, &wp2);
+        vector2 sp3 = camera_world_to_screen_point(s->camera, &wp3);
+
+        scanline_raster(s->screen, &sp1, &sp2, &sp3);
     }  
 } 
    
