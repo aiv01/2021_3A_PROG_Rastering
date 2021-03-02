@@ -6,6 +6,7 @@
 #include "camera.h"
 
 #include "wobj.h"
+#include "texture.h"
 
 typedef struct{
     vector3 v1;
@@ -20,6 +21,8 @@ typedef struct {
     wobj* quad_obj;
     wobj* suzanne_obj;
     float suzanne_rotation;
+    wobj* trup_obj;
+    texture* trup_texture;
 } scene;
 
 scene* scene_create(int w, int h, SDL_Renderer*);

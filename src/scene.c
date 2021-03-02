@@ -7,6 +7,8 @@
 #include <string.h>
 #include "wobj.h"
 #include "scanline-raster.h"
+#include "texture.h"
+
 
 scene* scene_create(int screen_width, int screen_height, SDL_Renderer* r) {
     scene* s = malloc(sizeof(scene));
@@ -21,6 +23,9 @@ scene* scene_create(int screen_width, int screen_height, SDL_Renderer* r) {
     s->quad_obj = wobj_from_file("resources/quad.obj");
     s->suzanne_obj = wobj_from_file("resources/suzanne.obj");
     s->suzanne_rotation = 0.f;
+
+    s->trup_obj = wobj_from_file("resources/stormtrooper.obj");
+    s->trup_texture = texture_load("resources/stormtrooper.png");
     return s;
 }
 
@@ -165,6 +170,8 @@ void scene_update(scene* s, float delta_time) {
 }
 
 void scene_destroy(scene* s) {
+    texture_destroy(s->trup_texture);
+    wobj_destroy(s->trup_obj);
     wobj_destroy(s->suzanne_obj);
     wobj_destroy(s->quad_obj);
     screen_destroy(s->screen);
