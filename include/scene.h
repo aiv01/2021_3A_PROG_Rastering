@@ -17,6 +17,9 @@ typedef struct {
     triangle triangle;
     screen* screen;
     camera* camera;
+    wobj* quad_obj;
+    wobj* suzanne_obj;
+    float suzanne_rotation;
 } scene;
 
 scene* scene_create(int w, int h, SDL_Renderer*);
