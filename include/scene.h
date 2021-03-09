@@ -23,6 +23,7 @@ typedef struct {
     float suzanne_rotation;
     wobj* trup_obj;
     texture* trup_texture;
+    texture* quad_texture;
 } scene;
 
 scene* scene_create(int w, int h, SDL_Renderer*);

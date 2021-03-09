@@ -22,5 +22,11 @@ typedef struct{
     int y;
 } vector2;
 
+typedef struct{
+    float x;
+    float y;
+} vector2f;
+
 vector2 vector2_new(int x, int y);
+vector2f vector2f_new(float x, float y);
 #endif

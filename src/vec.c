@@ -40,3 +40,10 @@ vector2 vector2_new(int x, int y){
     v.y = y;
     return v;
 }
+
+vector2f vector2f_new(float x, float y){
+    vector2f v;
+    v.x = x;
+    v.y = y;
+    return v;
+}

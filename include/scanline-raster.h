@@ -2,25 +2,66 @@
 #include "vec.h"
 #include "screen.h"
 
-typedef struct {
-    vector2* screen_pos;
-    color* color;
+typedef enum
+{
+    CONTEXT_FLAG_COLOR,
+    CONTEXT_FLAG_TEXTURE
+} context_flags;
+
+typedef struct
+{
+    screen *screen;
+    texture *tex;
+    context_flags flags;
+} context;
+
+typedef struct
+{
+    vector2f *uv;
+    vector2 *screen_pos;
+    color *color;
     float z;
 } vertex;
 
 // y: v1 < v2 < v3
-static void __sort_by_y(vertex** v1, vertex** v2, vertex** v3) {
-    vertex* temp;
-    if ( (*v1)->screen_pos->y > (*v2)->screen_pos->y) { temp = *v1; *v1 = *v2; *v2 = temp; }
-    if ( (*v2)->screen_pos->y > (*v3)->screen_pos->y) { temp = *v2; *v2 = *v3; *v3 = temp; }
-    if ( (*v1)->screen_pos->y > (*v2)->screen_pos->y) { temp = *v1; *v1 = *v2; *v2 = temp; }
+static void __sort_by_y(vertex **v1, vertex **v2, vertex **v3)
+{
+    vertex *temp;
+    if ((*v1)->screen_pos->y > (*v2)->screen_pos->y)
+    {
+        temp = *v1;
+        *v1 = *v2;
+        *v2 = temp;
+    }
+    if ((*v2)->screen_pos->y > (*v3)->screen_pos->y)
+    {
+        temp = *v2;
+        *v2 = *v3;
+        *v3 = temp;
+    }
+    if ((*v1)->screen_pos->y > (*v2)->screen_pos->y)
+    {
+        temp = *v1;
+        *v1 = *v2;
+        *v2 = temp;
+    }
 }
 
-static float __interpolate_scalar(float a, float b, float gradient) {
+static float __interpolate_scalar(float a, float b, float gradient)
+{
     return (b - a) * gradient + a;
 }
 
-static color __interpolate_color(color* a, color* b, float gradient) {
+static vector2f __interpolate_vector2f(vector2f *a, vector2f *b, float gradient)
+{
+    vector2f v;
+    v.x = __interpolate_scalar(a->x, b->x, gradient);
+    v.y = __interpolate_scalar(a->y, b->y, gradient);
+    return v;
+}
+
+static color __interpolate_color(color *a, color *b, float gradient)
+{
     color c;
     c.r = (int)__interpolate_scalar(a->r, b->r, gradient);
     c.g = (int)__interpolate_scalar(a->g, b->g, gradient);
@@ -29,16 +70,16 @@ static color __interpolate_color(color* a, color* b, float gradient) {
     return c;
 }
 
-static void __interpolate_row(screen* s, int y,
-    vertex* left_edge_v1, vertex* left_edge_v2,
-    vertex* right_edge_v1, vertex* right_edge_v2
-    ) {
+static void __interpolate_row(context *context, int y,
+                              vertex *left_edge_v1, vertex *left_edge_v2,
+                              vertex *right_edge_v1, vertex *right_edge_v2)
+{
 
-    vector2* left_edge_p1 = left_edge_v1->screen_pos;
-    vector2* left_edge_p2 = left_edge_v2->screen_pos;
-    vector2* right_edge_p1 = right_edge_v1->screen_pos;
-    vector2* right_edge_p2 = right_edge_v2->screen_pos;
-    
+    vector2 *left_edge_p1 = left_edge_v1->screen_pos;
+    vector2 *left_edge_p2 = left_edge_v2->screen_pos;
+    vector2 *right_edge_p1 = right_edge_v1->screen_pos;
+    vector2 *right_edge_p2 = right_edge_v2->screen_pos;
+
     float left_gradient_y = 1.f;
     if (left_edge_p2->y != left_edge_p1->y)
         left_gradient_y = (float)(y - left_edge_p1->y) / (float)(left_edge_p2->y - left_edge_p1->y);
@@ -50,25 +91,55 @@ static void __interpolate_row(screen* s, int y,
     int left_x = (int)__interpolate_scalar(left_edge_p1->x, left_edge_p2->x, left_gradient_y);
     int right_x = (int)__interpolate_scalar(right_edge_p1->x, right_edge_p2->x, right_gradient_y);
 
-    color left_color = __interpolate_color(left_edge_v1->color, left_edge_v2->color, left_gradient_y);
-    color right_color = __interpolate_color(right_edge_v1->color, right_edge_v2->color, left_gradient_y);
+    color left_color, right_color;
+    if (context->flags == CONTEXT_FLAG_COLOR)
+    {
+        left_color = __interpolate_color(left_edge_v1->color, left_edge_v2->color, left_gradient_y);
+        right_color = __interpolate_color(right_edge_v1->color, right_edge_v2->color, left_gradient_y);
+    }
+
+    vector2f left_uv, right_uv;
+    if (context->flags == CONTEXT_FLAG_TEXTURE)
+    {
+        left_uv = __interpolate_vector2f(left_edge_v1->uv, left_edge_v2->uv, left_gradient_y);
+        right_uv = __interpolate_vector2f(right_edge_v1->uv, right_edge_v2->uv, right_gradient_y);
+    }
 
     float left_z = __interpolate_scalar(left_edge_v1->z, left_edge_v2->z, left_gradient_y);
     float right_z = __interpolate_scalar(right_edge_v1->z, right_edge_v2->z, right_gradient_y);
 
-
-    for(int x=left_x; x <= right_x; x++) {
+    for (int x = left_x; x <= right_x; x++)
+    {
         float gradient_x = 1.f;
-        if (left_x < right_x) gradient_x = (float)(x - left_x) / (float)(right_x - left_x);
-        color c = __interpolate_color(&left_color, &right_color, gradient_x);
+        if (left_x < right_x)
+            gradient_x = (float)(x - left_x) / (float)(right_x - left_x);
+
+        color c;
+        if (context->flags == CONTEXT_FLAG_COLOR)
+            c = __interpolate_color(&left_color, &right_color, gradient_x);
+
+        if (context->flags == CONTEXT_FLAG_TEXTURE)
+        {
+            vector2f uv = __interpolate_vector2f(&left_uv, &right_uv, gradient_x);
+            uv.y = 1 - uv.y;
+            texture *tex = context->tex;
+            int tex_x_coord = uv.x * (float)(tex->width - 1);
+            int tex_y_coord = uv.y * (float)(tex->height - 1);
+            int tex_index = (tex_y_coord * tex->width + tex_x_coord) * tex->pixel_size;
+            c.r = tex->data[tex_index + 0];
+            c.g = tex->data[tex_index + 1];
+            c.b = tex->data[tex_index + 2];
+            c.a = tex->data[tex_index + 3];
+        }
 
         float z = __interpolate_scalar(left_z, right_z, gradient_x);
 
-        screen_put_pixel(s, x, y, z, &c);
+        screen_put_pixel(context->screen, x, y, z, &c);
     }
 }
 
-static void scanline_raster(screen* s, vertex* v1, vertex* v2, vertex* v3) {
+static void scanline_raster(context *c, vertex *v1, vertex *v2, vertex *v3)
+{
     //Individuare il tipo di triangolo
     __sort_by_y(&v1, &v2, &v3);
 
@@ -76,20 +147,31 @@ static void scanline_raster(screen* s, vertex* v1, vertex* v2, vertex* v3) {
     float inv_slope_v1v3 = (float)(v3->screen_pos->x - v1->screen_pos->x) / (float)(v3->screen_pos->y - v1->screen_pos->y);
 
     // Triangolo con v2 a sinistra <|
-    if (inv_slope_v1v2 < inv_slope_v1v3) {
-        for(int y = (int)v1->screen_pos->y; y <= (int)v3->screen_pos->y; y++) {
-            if (y < v2->screen_pos->y) { //triangolo superiore
-                __interpolate_row(s, y, v1,v2, v1,v3);
-            } else { //triangolo inferiore
-                __interpolate_row(s, y, v2,v3, v1,v3);
+    if (inv_slope_v1v2 < inv_slope_v1v3)
+    {
+        for (int y = (int)v1->screen_pos->y; y <= (int)v3->screen_pos->y; y++)
+        {
+            if (y < v2->screen_pos->y)
+            { //triangolo superiore
+                __interpolate_row(c, y, v1, v2, v1, v3);
+            }
+            else
+            { //triangolo inferiore
+                __interpolate_row(c, y, v2, v3, v1, v3);
             }
         }
-    } else {// Triangolo con v2 a destra |>
-        for(int y = (int)v1->screen_pos->y; y <= (int)v3->screen_pos->y; y++) {
-            if (y < v2->screen_pos->y) { //triangolo superiore
-                __interpolate_row(s, y, v1,v3, v1,v2);
-            } else { //triangolo inferiore
-                __interpolate_row(s, y, v1,v3, v2,v3);
+    }
+    else
+    { // Triangolo con v2 a destra |>
+        for (int y = (int)v1->screen_pos->y; y <= (int)v3->screen_pos->y; y++)
+        {
+            if (y < v2->screen_pos->y)
+            { //triangolo superiore
+                __interpolate_row(c, y, v1, v3, v1, v2);
+            }
+            else
+            { //triangolo inferiore
+                __interpolate_row(c, y, v1, v3, v2, v3);
             }
         }
     }
