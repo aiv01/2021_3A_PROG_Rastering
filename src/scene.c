@@ -119,7 +119,10 @@ static void draw_trooper_textured(scene* s, float delta_time)
     c.flags = CONTEXT_FLAG_TEXTURE;
     c.ambient_intensity = 0.f;
     c.point_light_position = vector3_new(0,0,0);
-
+    c.camera_position = s->camera->position;
+    color c_specular = {255,0,255,255};
+    c.specular = c_specular;
+    c.specular_intensity = 50.f;
     //obj = s->quad_obj;
     //c.tex = s->quad_texture;
 

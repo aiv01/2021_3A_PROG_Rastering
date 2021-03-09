@@ -16,6 +16,9 @@ typedef struct
     color ambient;
     float ambient_intensity;
     vector3 point_light_position;
+    color specular;
+    float specular_intensity;
+    vector3 camera_position;
 } context;
 
 typedef struct
@@ -180,11 +183,27 @@ static void __interpolate_row(context *context, int y,
         lambert_value = __clampf(lambert_value, 0.f,1.f);
         color c_lambert = color_mul_scalar(&c, lambert_value);
 
-        
+        //Specular
+        //light directional 
+        vector3 light_dir_to_point = vector3_mult(&dir_to_light, -1.f);
+        //reflection vector
+        vector3 reflect= vector3_reflect_normal(&light_dir_to_point, &world_normal);
+        //normalize
+        reflect = vector3_normalize(&reflect);
+        //eye direction
+        vector3 dir_to_eye = vector3_sub(&context->camera_position, &world_position);
+        dir_to_eye = vector3_normalize(&dir_to_eye);
+        //dot eye*reflected
+        float specular_value = vector3_dot(&dir_to_eye, &reflect);
+        specular_value = __clampf(specular_value, 0,1);
+
+       
+        color c_specular = color_mul_scalar(&context->specular, powf(specular_value,context->specular_intensity));
 
 
         color final_color = c_ambient;
         final_color = color_sum(&final_color, &c_lambert);
+        final_color = color_sum(&final_color, &c_specular);
         final_color = color_clamp(&final_color);
         float z = __interpolate_scalar(left_z, right_z, gradient_x);
         screen_put_pixel(context->screen, x, y, z, &final_color);

@@ -46,6 +46,14 @@ float vector3_dot(vector3*a ,vector3*b){
     return a->x *b->x + a->y*b->y + a->z*b->z;
 }
 
+vector3 vector3_reflect_normal(vector3* v, vector3 * normal){
+    //v_r = v - 2*dot(v,n)*n;
+    float dot_2 = 2.f*vector3_dot(v,normal);
+    vector3 dot_norm = vector3_mult(normal,dot_2);
+    return vector3_sub(v,&dot_norm);
+
+}
+
 
 vector2 vector2_new(int x, int y){
     vector2 v;
