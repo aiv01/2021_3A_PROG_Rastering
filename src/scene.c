@@ -117,7 +117,10 @@ static void draw_trooper_textured(scene* s, float delta_time)
     c.screen = s->screen;
     c.tex = s->trup_texture;
     c.flags = CONTEXT_FLAG_TEXTURE;
-
+    color ambient_color = {255,0,0,255};
+    c.ambient = ambient_color;
+    c.ambient_intensity = 0.2f;
+    c.point_light_position = vector3_new(3,0,-1);
     for (size_t i = 0; i < obj->triangles_count; i++)
     {
         wobj_triangle *t = &obj->triangles[i];
@@ -126,10 +129,14 @@ static void draw_trooper_textured(scene* s, float delta_time)
         vector3 wp2 = vector3_mult((vector3 *)&t->v2.position, 2.f);
         vector3 wp3 = vector3_mult((vector3 *)&t->v3.position, 2.f);
 
-        s->suzanne_rotation += 0.005f * delta_time;
+        s->suzanne_rotation +=0.f * delta_time;
         wp1 = vector3_rotate_on_y(&wp1, s->suzanne_rotation);
         wp2 = vector3_rotate_on_y(&wp2, s->suzanne_rotation);
         wp3 = vector3_rotate_on_y(&wp3, s->suzanne_rotation);
+
+        vector3 wn1 = vector3_rotate_on_y((vector3*)&t->v1.normal, s->suzanne_rotation);
+        vector3 wn2 = vector3_rotate_on_y((vector3*)&t->v2.normal, s->suzanne_rotation);
+        vector3 wn3 = vector3_rotate_on_y((vector3*)&t->v3.normal, s->suzanne_rotation);
 
         vector3 translation = { 0, 3.2f, 3 };
         wp1 = vector3_sub(&wp1, &translation);
@@ -149,14 +156,22 @@ static void draw_trooper_textured(scene* s, float delta_time)
         v1.screen_pos = &sp1;
         v1.uv = (vector2f *)&t->v1.uv;
         v1.z = cp1.z;
+        v1.world_normal = &wn1;
+        v1.world_pos = &wp1;
         vertex v2;
         v2.screen_pos = &sp2;
         v2.uv = (vector2f *)&t->v2.uv;
         v2.z = cp2.z;
+        v2.world_normal = &wn2;
+        v2.world_pos = &wp2;
+
         vertex v3;
         v3.screen_pos = &sp3;
         v3.uv = (vector2f *)&t->v3.uv;
         v3.z = cp3.z;
+        v3.world_normal = &wn3;
+        v3.world_pos = &wp3;
+
 
         scanline_raster(&c, &v1, &v2, &v3);
     }

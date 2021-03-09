@@ -34,6 +34,19 @@ vector3 vector3_rotate_on_y(vector3* v, float degrees) {
     return r;
 }
 
+vector3 vector3_normalize(vector3* v){
+    return vector3_mult(v, 1.f/vector3_magnitude(v));
+}
+
+float vector3_magnitude(vector3*v){
+    return sqrtf( v->x*v->x + v->y*v->y + v->z*v->z);
+}
+
+float vector3_dot(vector3*a ,vector3*b){
+    return a->x *b->x + a->y*b->y + a->z*b->z;
+}
+
+
 vector2 vector2_new(int x, int y){
     vector2 v;
     v.x = x;

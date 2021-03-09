@@ -13,12 +13,17 @@ typedef struct
     screen *screen;
     texture *tex;
     context_flags flags;
+    color ambient;
+    float ambient_intensity;
+    vector3 point_light_position;
 } context;
 
 typedef struct
 {
     vector2f *uv;
     vector2 *screen_pos;
+    vector3 *world_normal;
+    vector3 *world_pos;
     color *color;
     float z;
 } vertex;
@@ -70,6 +75,24 @@ static color __interpolate_color(color *a, color *b, float gradient)
     return c;
 }
 
+static vector3 __interpolate_vector3(vector3 *a, vector3 *b, float gradient){
+    vector3 v;
+    v.x = __interpolate_scalar(a->x, b->x, gradient);
+    v.y = __interpolate_scalar(a->y, b->y, gradient);
+    v.z = __interpolate_scalar(a->z, b->z, gradient);
+    return v;
+}
+
+static float __clampf(float val, float min, float max){
+    if(val>max){
+       return max;
+    }
+    if(val<min){
+        return min;
+    }
+    return val;
+}
+
 static void __interpolate_row(context *context, int y,
                               vertex *left_edge_v1, vertex *left_edge_v2,
                               vertex *right_edge_v1, vertex *right_edge_v2)
@@ -105,6 +128,15 @@ static void __interpolate_row(context *context, int y,
         right_uv = __interpolate_vector2f(right_edge_v1->uv, right_edge_v2->uv, right_gradient_y);
     }
 
+    //world normal
+    vector3 left_world_normal = __interpolate_vector3(left_edge_v1->world_normal, left_edge_v2->world_normal,left_gradient_y);
+    vector3 right_world_normal = __interpolate_vector3(right_edge_v1->world_normal, right_edge_v2->world_normal, right_gradient_y);
+
+    //world pixel position 
+    vector3 left_world_position = __interpolate_vector3(left_edge_v1->world_pos, left_edge_v2->world_pos,left_gradient_y);
+    vector3 right_world_position = __interpolate_vector3(right_edge_v1->world_pos, right_edge_v2->world_pos, right_gradient_y);
+
+
     float left_z = __interpolate_scalar(left_edge_v1->z, left_edge_v2->z, left_gradient_y);
     float right_z = __interpolate_scalar(right_edge_v1->z, right_edge_v2->z, right_gradient_y);
 
@@ -126,15 +158,36 @@ static void __interpolate_row(context *context, int y,
             int tex_x_coord = uv.x * (float)(tex->width - 1);
             int tex_y_coord = uv.y * (float)(tex->height - 1);
             int tex_index = (tex_y_coord * tex->width + tex_x_coord) * tex->pixel_size;
+
+            //Texture
             c.r = tex->data[tex_index + 0];
             c.g = tex->data[tex_index + 1];
             c.b = tex->data[tex_index + 2];
             c.a = tex->data[tex_index + 3];
+
+
         }
+        //Ambient
+        color c_ambient = color_mul_scalar(&c, context->ambient_intensity );
 
+        //Lambert
+        vector3 world_normal = __interpolate_vector3(&left_world_normal, &right_world_normal, gradient_x);
+        world_normal = vector3_normalize(&world_normal);
+        vector3 world_position = __interpolate_vector3(&left_world_position, &right_world_position, gradient_x);
+        vector3 dir_to_light = vector3_sub(&context->point_light_position,&world_position);
+        dir_to_light = vector3_normalize(&dir_to_light);
+        float lambert_value = vector3_dot(&dir_to_light,&world_normal) ;
+        lambert_value = __clampf(lambert_value, 0.f,1.f);
+        color c_lambert = color_mul_scalar(&c, lambert_value);
+
+        
+
+
+        color final_color = c_ambient;
+        final_color = color_sum(&final_color, &c_lambert);
+        final_color = color_clamp(&final_color);
         float z = __interpolate_scalar(left_z, right_z, gradient_x);
-
-        screen_put_pixel(context->screen, x, y, z, &c);
+        screen_put_pixel(context->screen, x, y, z, &final_color);
     }
 }
 

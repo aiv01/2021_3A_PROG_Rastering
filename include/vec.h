@@ -16,6 +16,12 @@ vector3 vector3_mult(vector3* v, float scalar);
 
 vector3 vector3_rotate_on_y(vector3* v, float degrees);
 
+vector3 vector3_normalize(vector3* v);
+
+float vector3_magnitude(vector3*v);
+
+float vector3_dot(vector3*a ,vector3*b);
+
 
 typedef struct{
     int x;
