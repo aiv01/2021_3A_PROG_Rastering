@@ -164,7 +164,13 @@ void scene_update(scene* s, float delta_time) {
 */
 
     //draw_quad(s);
-    draw_suzanne(s, delta_time);
+    //draw_suzanne(s, delta_time);
+
+    /*
+    SDL_UpdateTexture(s->screen->texture, NULL, s->trup_texture->data
+        , s->trup_texture->width * s->trup_texture->pixel_size);
+    SDL_RenderCopy(s->screen->renderer, s->screen->texture, NULL, NULL);
+    */
 
     screen_blit(s->screen);
 }
