@@ -117,10 +117,12 @@ static void draw_trooper_textured(scene* s, float delta_time)
     c.screen = s->screen;
     c.tex = s->trup_texture;
     c.flags = CONTEXT_FLAG_TEXTURE;
-    color ambient_color = {255,0,0,255};
-    c.ambient = ambient_color;
-    c.ambient_intensity = 0.2f;
-    c.point_light_position = vector3_new(3,0,-1);
+    c.ambient_intensity = 0.f;
+    c.point_light_position = vector3_new(0,0,0);
+
+    //obj = s->quad_obj;
+    //c.tex = s->quad_texture;
+
     for (size_t i = 0; i < obj->triangles_count; i++)
     {
         wobj_triangle *t = &obj->triangles[i];
@@ -129,7 +131,7 @@ static void draw_trooper_textured(scene* s, float delta_time)
         vector3 wp2 = vector3_mult((vector3 *)&t->v2.position, 2.f);
         vector3 wp3 = vector3_mult((vector3 *)&t->v3.position, 2.f);
 
-        s->suzanne_rotation +=0.f * delta_time;
+        s->suzanne_rotation +=0.005f * delta_time;
         wp1 = vector3_rotate_on_y(&wp1, s->suzanne_rotation);
         wp2 = vector3_rotate_on_y(&wp2, s->suzanne_rotation);
         wp3 = vector3_rotate_on_y(&wp3, s->suzanne_rotation);
@@ -152,7 +154,6 @@ static void draw_trooper_textured(scene* s, float delta_time)
         vector3 cp3 = camera_world_to_camera_point(s->camera, &wp3);
 
         vertex v1;
-        
         v1.screen_pos = &sp1;
         v1.uv = (vector2f *)&t->v1.uv;
         v1.z = cp1.z;

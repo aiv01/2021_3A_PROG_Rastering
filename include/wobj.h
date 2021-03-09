@@ -182,7 +182,7 @@ static wobj* wobj_from_file(const char* file_path)
         t.v1.uv.x = w->uvs[uv_index];
         t.v1.uv.y = w->uvs[uv_index + 1];
 
-        normal_index = (w->faces[i*9 +2] -1) * 2;
+        normal_index = (w->faces[i*9 +2] -1) * 3;
         t.v1.normal.x = w->normals[normal_index + 0];
         t.v1.normal.y = w->normals[normal_index + 1];
         t.v1.normal.z = w->normals[normal_index + 2];
@@ -197,7 +197,7 @@ static wobj* wobj_from_file(const char* file_path)
         t.v2.uv.x = w->uvs[uv_index];
         t.v2.uv.y = w->uvs[uv_index + 1];
 
-        normal_index = (w->faces[i*9 +5] -1) * 2;
+        normal_index = (w->faces[i*9 +5] -1) * 3;
         t.v2.normal.x = w->normals[normal_index + 0];
         t.v2.normal.y = w->normals[normal_index + 1];
         t.v2.normal.z = w->normals[normal_index + 2];
@@ -212,7 +212,7 @@ static wobj* wobj_from_file(const char* file_path)
         t.v3.uv.x = w->uvs[uv_index];
         t.v3.uv.y = w->uvs[uv_index + 1];
 
-        normal_index = (w->faces[i*9 +8] -1) * 2;
+        normal_index = (w->faces[i*9 +8] -1) * 3;
         t.v3.normal.x = w->normals[normal_index + 0];
         t.v3.normal.y = w->normals[normal_index + 1];
         t.v3.normal.z = w->normals[normal_index + 2];
