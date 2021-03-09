@@ -57,6 +57,22 @@ void screen_clear(screen* s) {
     
 }
 
+void screen_clear_with_color(screen* s, color* c)
+{
+    for (size_t i = 0; i < s->width * s->height; i++)
+    {
+        s->color_buffer[(i * 4) + 0] = c->r;
+        s->color_buffer[(i * 4) + 1] = c->g;
+        s->color_buffer[(i * 4) + 2] = c->b;
+        s->color_buffer[(i * 4) + 3] = c->a;
+    }   
+
+    for (int i = 0; i < s->width * s->height; i++)
+    {
+        s->depth_buffer[i] = -FLT_MAX;
+    }
+}
+
 void screen_destroy(screen* s) {
     SDL_DestroyTexture(s->texture);
     free(s->color_buffer);

@@ -19,5 +19,6 @@ void screen_put_pixel(screen* s, int x, int y, float z, color* c); //color;
 
 void screen_blit(screen* s); 
 void screen_clear(screen* s);
+void screen_clear_with_color(screen* s, color* c);
 
 void screen_destroy(screen* s); 

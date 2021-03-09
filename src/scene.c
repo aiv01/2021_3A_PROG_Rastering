@@ -109,6 +109,59 @@ static void draw_quad_textured(scene *s)
     }
 }
 
+static void draw_trooper_textured(scene* s, float delta_time)
+{
+    wobj *obj = s->trup_obj;
+
+    context c;
+    c.screen = s->screen;
+    c.tex = s->trup_texture;
+    c.flags = CONTEXT_FLAG_TEXTURE;
+
+    for (size_t i = 0; i < obj->triangles_count; i++)
+    {
+        wobj_triangle *t = &obj->triangles[i];
+
+        vector3 wp1 = vector3_mult((vector3 *)&t->v1.position, 2.f);
+        vector3 wp2 = vector3_mult((vector3 *)&t->v2.position, 2.f);
+        vector3 wp3 = vector3_mult((vector3 *)&t->v3.position, 2.f);
+
+        s->suzanne_rotation += 0.005f * delta_time;
+        wp1 = vector3_rotate_on_y(&wp1, s->suzanne_rotation);
+        wp2 = vector3_rotate_on_y(&wp2, s->suzanne_rotation);
+        wp3 = vector3_rotate_on_y(&wp3, s->suzanne_rotation);
+
+        vector3 translation = { 0, 3.2f, 3 };
+        wp1 = vector3_sub(&wp1, &translation);
+        wp2 = vector3_sub(&wp2, &translation);
+        wp3 = vector3_sub(&wp3, &translation);
+
+        vector2 sp1 = camera_world_to_screen_point(s->camera, &wp1);
+        vector2 sp2 = camera_world_to_screen_point(s->camera, &wp2);
+        vector2 sp3 = camera_world_to_screen_point(s->camera, &wp3);
+
+        vector3 cp1 = camera_world_to_camera_point(s->camera, &wp1);
+        vector3 cp2 = camera_world_to_camera_point(s->camera, &wp2);
+        vector3 cp3 = camera_world_to_camera_point(s->camera, &wp3);
+
+        vertex v1;
+        
+        v1.screen_pos = &sp1;
+        v1.uv = (vector2f *)&t->v1.uv;
+        v1.z = cp1.z;
+        vertex v2;
+        v2.screen_pos = &sp2;
+        v2.uv = (vector2f *)&t->v2.uv;
+        v2.z = cp2.z;
+        vertex v3;
+        v3.screen_pos = &sp3;
+        v3.uv = (vector2f *)&t->v3.uv;
+        v3.z = cp3.z;
+
+        scanline_raster(&c, &v1, &v2, &v3);
+    }
+}
+
 static void draw_suzanne_simple(scene *s, float delta_time)
 {
     wobj *obj = s->suzanne_obj;
@@ -200,8 +253,12 @@ static void draw_suzanne(scene *s, float delta_time)
 
 void scene_update(scene *s, float delta_time)
 {
-    screen_clear(s->screen);
-    draw_quad_textured(s);
+    color c = { 150, 150, 150, 255 };
+    //screen_clear(s->screen);
+    screen_clear_with_color(s->screen, &c);
+    // draw_quad_textured(s);
+    draw_trooper_textured(s, delta_time);
+
     /*
     vector2 v1 = {0, 0};
     vector2 v2 = {100, 100};
